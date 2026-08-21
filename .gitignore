@@ -1,1 +1,3 @@
 config.json
+relay-server/.env
+relay-server/*.log
