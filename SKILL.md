@@ -1,6 +1,6 @@
 ---
 name: signup-agent
-description: 报名/登记信息收集 agent（中转服务模式）。触发词：「报名」「登记」「收集报名」「签到」「名单」「帮我记一下」。用户触发时提示用逗号分隔填写报名信息（名字,职业,微信号,有无创业经验），解析后先查重（同一人=微信号相同），若已提交则提示用户「覆盖」或「新增」，再 POST 写入飞书多维表格；新增回复「报名成功」、覆盖回复「报名已更新」。飞书凭证仅存于中转服务端，客户端零敏感信息。需中转服务 endpoint 配置在 config.json。
+description: 报名/登记信息收集 agent（中转服务模式）。触发词：「报名」「登记」「收集报名」「签到」「名单」「帮我记一下」。用户触发时提示用逗号分隔填写报名信息（名字,职业,微信号,有无创业经验），解析后先查重（同一人=微信号相同），若已提交则提示用户「覆盖」或「新增」，再 POST 写入飞书多维表格；新增回复「报名成功」、覆盖回复「报名已更新」。飞书凭证仅存于中转服务端，客户端零敏感信息。需中转服务 endpoint 配置在 relay-server/config.json。
 metadata:
   requires:
     bins: ["curl"]
@@ -12,7 +12,7 @@ metadata:
 收集报名信息 → 通过中转服务写入飞书多维表格。飞书凭证只在**中转服务端**持有，本 skill 不包含任何飞书 token。
 
 ## 配置（私密，不入库）
-本目录 `config.json`（与 SKILL.md 同级）存放中转服务地址：
+`relay-server/config.json` 存放中转服务地址（与 `relay-server/.env` 同目录）：
 ```json
 {"endpoint":"<你的中转服务URL>","api_key":"<可选，服务端设置了才填>"}
 ```
@@ -51,7 +51,7 @@ $resp = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=<微信号>" -Method Ge
   - 用户回「新增一条」/「新增」→ 正常提交（不带 overwrite），新增一行。
 
 ### 4. 发送到中转服务（静默）
-从 `config.json` 读取 `endpoint` 与可选 `api_key`，用 exec 工具发送 POST。
+从 `relay-server/config.json` 读取 `endpoint` 与可选 `api_key`，用 exec 工具发送 POST。
 - 覆盖场景：body 额外加 `"overwrite":true,"record_id":"<查重返回的record_id>"`。
 
 PowerShell（OpenClaw 默认，**必须用 UTF-8 字节发，否则中文 body 会 400**）：
