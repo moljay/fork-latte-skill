@@ -1,10 +1,8 @@
-# 报名 Agent Skill
+# coffee chat 报名Skill
 
-![Version](https://img.shields.io/gitee/v/tag/qidianjuzhen/agibar-invite-skill?label=version&color=blue&sort=semver) ![License](https://img.shields.io/badge/license-MIT-green) ![API](https://img.shields.io/badge/api-REST-orange) ![Mode](https://img.shields.io/badge/mode-lark__cli%20%7C%20feishu__api-blue)
+![Version](https://img.shields.io/gitee/v/tag/qidianjuzhen/agibar-invite-skill?label=version&color=blue&sort=semver) ![API](https://img.shields.io/badge/api-REST-orange) ![Mode](https://img.shields.io/badge/mode-lark__cli%20%7C%20feishu__api-blue)
 
-这是一个 AI Skill——安装后，你的 AI 助手就能收集报名信息，按「名字,职业,微信号,有无创业经验」提交，自动查重（同一人 = 微信号相同），可选择覆盖旧记录或新增一条，并写入飞书多维表格。
-
-一个「中转服务模式」的报名收集工具，客户端只管对话，数据经中转服务落表，飞书凭证不出服务端。
+这是一个临时的 coffee chat报名Skill——安装后，你的 AI 助手就能收集报名信息，请按 "ping(名字,职业,微信号,有无创业经验)" 提交真实信息（名字可以使英文名、艺名、花名等），自动查重（同一人 = 微信号相同），可选择覆盖旧记录或新增一条，并写入飞书多维表格。
 
 ## 关于这个 Skill
 
@@ -21,7 +19,7 @@
 
 | 能力 | 你可以说 |
 |------|----------|
-| 收集报名 | "报名" |
+| 收集报名 | ping(名字,职业,微信号,有无创业经验) |
 | 自动查重 | （同一微信号二次提交先提示，不静默覆盖） |
 | 覆盖 / 新增 | "覆盖" / "新增" |
 | 写入飞书 | — |
@@ -34,17 +32,17 @@
 
 | 操作 | 说明 | 你可以说 |
 |------|------|----------|
-| 提交报名 | 按格式填四项，写入新记录 | "报名" |
+| 提交报名 | 按格式填四项，写入新记录 | "ping(..." |
 | 查重提示 | 同一微信号已有记录时，先问你要不要覆盖 | — |
 | 覆盖 | 用新信息更新已有记录 | "覆盖" |
 | 新增 | 保留旧记录，再建一条 | "新增" |
 
 **使用流程：**
 
-1. 对 AI 助手说「报名」
+1. 对 AI 助手说 ping(名字,职业,微信号,有无创业经验)
 2. 按格式填：名字,职业,微信号,有无创业经验（中英文逗号都认）
 3. AI 先查重；若该微信号已有记录，问你「覆盖还是新增」
-4. 提交写入飞书表，返回记录 ID
+4. 提交写入飞书表
 
 ## 运行环境
 
@@ -75,7 +73,3 @@ Agent 会自动克隆仓库并安装到对应的 Skill 目录。
 ## 版本
 
 版本号见顶部徽章，以 Git Tag 为准。
-
-## License
-
-[MIT](LICENSE)
