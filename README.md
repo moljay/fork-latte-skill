@@ -1,4 +1,4 @@
-# 报名 Agent Skill
+# 9.5五道口AGI Bar“AI社交”coffeechat Skill
 
 ![Version](https://img.shields.io/gitee/v/tag/qidianjuzhen/signup-agent?label=version&color=blue&sort=semver) ![License](https://img.shields.io/badge/license-MIT-green) ![API](https://img.shields.io/badge/api-REST-orange) ![Mode](https://img.shields.io/badge/mode-lark__cli%20%7C%20feishu__api-blue)
 
