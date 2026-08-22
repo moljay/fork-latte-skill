@@ -1,0 +1,4 @@
+﻿{
+  "endpoint": "http://你的中转服务地址/api/signup",
+  "api_key": "<若中转服务端设置了 API_KEY 则填，否则留空>"
+}
