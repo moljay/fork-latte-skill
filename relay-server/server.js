@@ -82,9 +82,11 @@ function runLarkCli(args) {
 // 构造写入字段（两种模式的单选字段形状不同）
 function buildFields(name, job, wechat, exp) {
   if (MODE === 'lark_cli') {
+    // lark-cli 单选字段用数组包裹
     return { 名字: name, 职业: job, 微信号: wechat, 有无创业经验: [exp] };
   }
-  return { 名字: name, 职业: job, 微信号: wechat, 有无创业经验: [{ text: exp }] };
+  // feishu_api：单选字段（SingleSelect）写入时值必须是纯字符串，不能是 {text:...}
+  return { 名字: name, 职业: job, 微信号: wechat, 有无创业经验: exp };
 }
 
 // 查重：返回第一个微信号匹配的记录 { record_id, fields:{名字,职业,微信号,有无创业经验} } 或 null
@@ -153,7 +155,8 @@ async function writeViaFeishuApi(fields, recordId) {
   });
   const j = await r.json();
   if (j.code !== 0) throw new Error('feishu_write: ' + JSON.stringify(j));
-  return recordId || j.data.record_id;
+  // 飞书创建/更新记录返回结构：data.record.record_id（兼容旧版 data.record_id）
+  return recordId || (j.data && j.data.record && j.data.record.record_id) || j.data.record_id;
 }
 
 async function writeViaLarkCli(fields, recordId) {

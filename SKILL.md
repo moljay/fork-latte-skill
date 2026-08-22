@@ -46,12 +46,13 @@ metadata:
 ### 3. 查重（提交前先问中转服务）
 同一人 = 微信号相同。发送前先调用查重接口（GET）：
 
-PowerShell（查重是 GET、微信号在 URL 里，无中文 body 问题）：
+PowerShell（查重是 GET、微信号在 URL 里，无中文 body 问题；服务端若设置了 API_KEY，必须带 `x-api-key` 头，否则 401）：
 ```powershell
-$resp = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=<微信号>" -Method Get
+$headers = if ("<api_key>" -ne "") { @{ "x-api-key" = "<api_key>" } } else { @{} }
+$resp = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=<微信号>" -Method Get -Headers $headers
 # $resp.exists 为 $true/$false；$resp.record_id、$resp.fields 为已有记录（fields 含 名字/职业/微信号/有无创业经验）
 ```
-（macOS/Linux：`curl -s "<endpoint>/exists?wechat=<微信号>"`。）
+（macOS/Linux：`curl -s -H "x-api-key: <api_key>" "<endpoint>/exists?wechat=<微信号>"`；服务端未设 API_KEY 时可省略 `-H`。）
 
 - 若 `exists` 为 **false** → 直接进入步骤 4 正常提交。
 - 若 `exists` 为 **true** → 先向用户确认（用返回里的之前记录）：
