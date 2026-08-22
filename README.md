@@ -1,6 +1,6 @@
 # 报名 Agent Skill
 
-![Version](https://img.shields.io/gitee/v/tag/qidianjuzhen/agibar-cc-skill?label=version&color=blue&sort=semver) ![License](https://img.shields.io/badge/license-MIT-green) ![API](https://img.shields.io/badge/api-REST-orange) ![Mode](https://img.shields.io/badge/mode-lark__cli%20%7C%20feishu__api-blue)
+![Version](https://img.shields.io/gitee/v/tag/qidianjuzhen/agibar-invite-skill?label=version&color=blue&sort=semver) ![License](https://img.shields.io/badge/license-MIT-green) ![API](https://img.shields.io/badge/api-REST-orange) ![Mode](https://img.shields.io/badge/mode-lark__cli%20%7C%20feishu__api-blue)
 
 这是一个 AI Skill——安装后，你的 AI 助手就能收集报名信息，按「名字,职业,微信号,有无创业经验」提交，自动查重（同一人 = 微信号相同），可选择覆盖旧记录或新增一条，并写入飞书多维表格。
 
@@ -54,7 +54,7 @@
 
 直接拷贝下面这句话发给你的 AI 助手：
 
-> 安装 https://gitee.com/qidianjuzhen/agibar-cc-skill
+> 安装 https://gitee.com/qidianjuzhen/agibar-invite-skill
 
 Agent 会自动克隆仓库并安装到对应的 Skill 目录。
 
@@ -70,7 +70,7 @@ Agent 会自动克隆仓库并安装到对应的 Skill 目录。
 ## 发布平台
 
 - GitHub：https://github.com/moljay/signup-agent
-- Gitee：https://gitee.com/qidianjuzhen/agibar-cc-skill
+- Gitee：https://gitee.com/qidianjuzhen/agibar-invite-skill
 
 ## 版本
 
