@@ -52,11 +52,11 @@
 
 把下面任一句话发给你的 AI 助手，它会自动克隆仓库并安装到对应的 Skill 目录：
 
-- GitHub：安装 https://github.com/moljay/agibar-invite-skill
-- Gitee：安装 https://gitee.com/qidianjuzhen/agibar-invite-skill
+- GitHub：安装 https://github.com/moljay/fork-latte-skill
+- Gitee：安装 https://gitee.com/qidianjuzhen/fork-latte-skill
 
 手动安装：将仓库克隆到 OpenClaw 的 skills 目录即可，例如
-`git clone https://github.com/moljay/agibar-invite-skill ~/.qclaw/skills/signup-agent`
+`git clone https://github.com/moljay/fork-latte-skill ~/.qclaw/skills/signup-agent`
 
 ## 服务端配置（relay-server）
 
@@ -69,8 +69,8 @@
 
 ## 发布平台
 
-- GitHub：https://github.com/moljay/agibar-invite-skill
-- Gitee：https://gitee.com/qidianjuzhen/agibar-invite-skill
+- GitHub：https://github.com/moljay/fork-latte-skill
+- Gitee：https://gitee.com/qidianjuzhen/fork-latte-skill
 
 ## 版本
 
