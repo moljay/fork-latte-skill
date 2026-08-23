@@ -1,6 +1,6 @@
 ---
 name: fork-latte-skill
-version: 1.0.2
+version: 1.0.3
 description: 报名/登记信息收集 agent（中转服务模式）。触发词：「ping」。用户触发时提示用逗号分隔填写报名信息（名字,职业,微信号,有无创业经验），解析后先查重（同一人=微信号相同），若已提交则提示用户「覆盖」或「新增」，再 POST 写入飞书多维表格；新增回复「报名成功」、覆盖回复「报名已更新」。飞书凭证仅存于中转服务端，客户端零敏感信息。需中转服务 endpoint 配置在 relay-server/config.json。
 metadata:
   requires:
@@ -17,17 +17,22 @@ metadata:
 ```json
 {"endpoint":"<你的中转服务URL>","api_key":"<可选，服务端设置了才填>"}
 ```
-- **若该文件不存在，先复制**：`Copy-Item relay-server/config.example.json relay-server/config.json`（example 已含默认 endpoint 与 api_key，无需手填）。运行任何 ping 流程前必须确保 `config.json` 存在。
+- **内置默认坐标（无需任何文件即可用）**：本 skill 已内置默认 endpoint 与 api_key，指向本地中转服务：
+  - `endpoint` = `http://localhost:3000/api/signup`
+  - `api_key` = `jcc_signup_a7K9mP2xQ8vL4nR6wT1yZ68`
+  - 只要本机中转服务（relay-server）在跑，无需 `config.json` 就能直接报名。
+- 若同目录 `relay-server/config.json` 存在，以其 `endpoint` / `api_key` 覆盖默认值（自托管改自己地址时用）。
 - endpoint 只是个普通 URL，不属敏感信息；但同样不要向用户主动展示。
-- `config.example.json` 已内置可用默认坐标（本地中转 `http://localhost:3000/api/signup` + 共享 api_key），自托管时改掉 endpoint 即可。
+- `config.example.json` 含同样默认坐标，可作参考或自托管模板。
 
 ## 交互流程（用户触发「报名/登记」等时启动）
 
-### 前置：确保 config.json 存在（每次运行必做，不要询问用户）
-读取同目录 `relay-server/config.json`：
-- 若存在 → 直接用其 `endpoint` / `api_key`。
-- 若**不存在** → 立即执行（无需询问用户）：`Copy-Item relay-server/config.example.json relay-server/config.json`。example 已含默认 endpoint 与 api_key，复制后即可用，复制完成再继续。
-- 之后所有步骤的 `<endpoint>` / `<api_key>` 均取自该文件。
+### 前置：确定 endpoint 与 api_key（每次运行必做，不要询问用户）
+- 优先读同目录 `relay-server/config.json` 的 `endpoint` / `api_key`。
+- 若 `config.json` 不存在或读不到 → **直接使用内置默认值，无需创建任何文件、无需询问用户**：
+  - `endpoint` = `http://localhost:3000/api/signup`
+  - `api_key` = `jcc_signup_a7K9mP2xQ8vL4nR6wT1yZ68`
+- 之后所有步骤的 `<endpoint>` / `<api_key>` 均取自上述结果（config.json 优先，否则内置默认）。
 
 ### 0. 快捷格式（ping 触发，一步到位）
 若用户消息匹配 `ping(内容)` / `ping（内容）`（中英文圆括号均可），**直接提取括号内文本**作为报名信息，跳过步骤 1 的提示，进入步骤 2 解析。
@@ -68,7 +73,7 @@ $resp = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=<微信号>" -Method Ge
   - 用户回「新增一条」/「新增」→ 正常提交（不带 overwrite），新增一行。
 
 ### 4. 发送到中转服务（静默）
-从 `relay-server/config.json` 读取 `endpoint` 与可选 `api_key`，用 exec 工具发送 POST。
+使用**前置步骤**确定的 `endpoint` 与（可选）`api_key`（config.json 优先，否则内置默认值），用 exec 工具发送 POST。
 - 覆盖场景：body 额外加 `"overwrite":true,"record_id":"<查重返回的record_id>"`。
 
 PowerShell（OpenClaw 默认，**必须用 UTF-8 字节发，否则中文 body 会 400**）：
