@@ -1,4 +1,1 @@
-﻿{
-  "endpoint": "http://你的中转服务地址/api/signup",
-  "api_key": "<若中转服务端设置了 API_KEY 则填，否则留空>"
-}
+{"endpoint":"http://localhost:3000/api/signup","api_key":"jcc_signup_a7K9mP2xQ8vL4nR6wT1yZ68"}
