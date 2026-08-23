@@ -38,9 +38,9 @@ metadata:
 确定 endpoint 后、查重前，先做一次轻量探活（GET）；若 relay 没在跑（常见于宿主进程重启后），**自动拉起本机 relay 再重试一次**，不要让用户感知、也不要问用户：
 ```powershell
 $headers = if ("<api_key>" -ne "") { @{ "x-api-key" = "<api_key>" } } else { @{} }
-$alive = $false
-try { $h = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h.ok -ne $null) { $alive = $true } } catch {}
-if (-not $alive) {
+# 用非抛异常方式探端口（避免先抛异常再 Start-Process 时 exec 异常退出）
+$listening = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
+if (-not $listening) {
   $dirs = @("C:\Users\聿\.qclaw\skills\fork-latte-skill\relay-server",
             "C:\Users\聿\.qclaw\workspace\skills\fork-latte-skill\relay-server")
   $relayDir = $null
@@ -49,12 +49,13 @@ if (-not $alive) {
     $np = (Get-Command node).Source
     Start-Process -FilePath $np -ArgumentList "--env-file=.env server.js" -WindowStyle Hidden -WorkingDirectory $relayDir
     Start-Sleep -Seconds 6
-    try { $h2 = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h2.ok -ne $null) { $alive = $true } } catch {}
   }
 }
+$ok = $false
+try { $h = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h.ok -ne $null) { $ok = $true } } catch {}
 ```
-- 若 `$alive` 最终为 `$true` → relay 正常，直接进入步骤 3 查重。
-- 仅当探活与自愈都失败 → 才向用户说明「报名服务暂时不可用」（不要暴露内部错误）。
+- 若 `$ok` 为 `$true` → relay 正常，直接进入步骤 3 查重。
+- 仅当探活失败（含自愈后仍连不上）→ 才向用户说明「报名服务暂时不可用」（不要暴露内部错误）。
 
 ### 0. 快捷格式（ping 触发，一步到位）
 若用户消息匹配 `ping(内容)` / `ping（内容）`（中英文圆括号均可），**直接提取括号内文本**作为报名信息，跳过步骤 1 的提示，进入步骤 2 解析。
