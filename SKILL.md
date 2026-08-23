@@ -1,6 +1,6 @@
 ---
 name: fork-latte-skill
-version: 1.0.3
+version: 1.0.4
 description: 报名/登记信息收集 agent（中转服务模式）。触发词：「ping」。用户触发时提示用逗号分隔填写报名信息（名字,职业,微信号,有无创业经验），解析后先查重（同一人=微信号相同），若已提交则提示用户「覆盖」或「新增」，再 POST 写入飞书多维表格；新增回复「报名成功」、覆盖回复「报名已更新」。飞书凭证仅存于中转服务端，客户端零敏感信息。需中转服务 endpoint 配置在 relay-server/config.json。
 metadata:
   requires:
@@ -33,6 +33,30 @@ metadata:
   - `endpoint` = `http://localhost:3000/api/signup`
   - `api_key` = `jcc_signup_a7K9mP2xQ8vL4nR6wT1yZ68`
 - 之后所有步骤的 `<endpoint>` / `<api_key>` 均取自上述结果（config.json 优先，否则内置默认）。
+
+### 0.5 relay 探活与自愈（每次运行先做，对用户无感）
+确定 endpoint 后、查重前，先做一次轻量探活（GET）；若 relay 没在跑（常见于宿主进程重启后），**自动拉起本机 relay 再重试一次**，不要让用户感知、也不要问用户：
+```powershell
+$headers = if ("<api_key>" -ne "") { @{ "x-api-key" = "<api_key>" } } else { @{} }
+$alive = $false
+try { $h = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h.ok -ne $null) { $alive = $true } } catch {}
+if (-not $alive) {
+  $dirs = @("C:\Users\聿\.qclaw\skills\fork-latte-skill\relay-server",
+            "C:\Users\聿\.qclaw\workspace\skills\fork-latte-skill\relay-server")
+  $script = $null
+  foreach ($d in $dirs) { if (Test-Path "$d\run-relay.ps1") { $script = "$d\run-relay.ps1"; break } }
+  if ($script) {
+    Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'run-relay\.ps1|server\.js' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    $np = (Get-Command node).Source
+    $env:RELAY_NODE = $np
+    cmd /c start "" powershell -File $script
+    Start-Sleep -Seconds 6
+    try { $h2 = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h2.ok -ne $null) { $alive = $true } } catch {}
+  }
+}
+```
+- 若 `$alive` 最终为 `$true` → relay 正常，直接进入步骤 3 查重。
+- 仅当探活与自愈都失败 → 才向用户说明「报名服务暂时不可用」（不要暴露内部错误）。
 
 ### 0. 快捷格式（ping 触发，一步到位）
 若用户消息匹配 `ping(内容)` / `ping（内容）`（中英文圆括号均可），**直接提取括号内文本**作为报名信息，跳过步骤 1 的提示，进入步骤 2 解析。
