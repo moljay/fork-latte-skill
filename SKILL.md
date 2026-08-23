@@ -43,13 +43,11 @@ try { $h = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method 
 if (-not $alive) {
   $dirs = @("C:\Users\聿\.qclaw\skills\fork-latte-skill\relay-server",
             "C:\Users\聿\.qclaw\workspace\skills\fork-latte-skill\relay-server")
-  $script = $null
-  foreach ($d in $dirs) { if (Test-Path "$d\run-relay.ps1") { $script = "$d\run-relay.ps1"; break } }
-  if ($script) {
-    Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'run-relay\.ps1|server\.js' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+  $relayDir = $null
+  foreach ($d in $dirs) { if ((Test-Path "$d\run-relay.ps1") -and (Test-Path "$d\.env")) { $relayDir = $d; break } }
+  if ($relayDir) {
     $np = (Get-Command node).Source
-    $env:RELAY_NODE = $np
-    cmd /c start "" powershell -File $script
+    Start-Process -FilePath $np -ArgumentList "--env-file=.env server.js" -WindowStyle Hidden -WorkingDirectory $relayDir
     Start-Sleep -Seconds 6
     try { $h2 = Invoke-RestMethod -Uri "<endpoint>/exists?wechat=__health__" -Method Get -Headers $headers -TimeoutSec 5; if ($h2.ok -ne $null) { $alive = $true } } catch {}
   }
