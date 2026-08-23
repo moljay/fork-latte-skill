@@ -1,6 +1,6 @@
 ---
 name: fork-latte-skill
-version: 1.0.1
+version: 1.0.2
 description: 报名/登记信息收集 agent（中转服务模式）。触发词：「ping」。用户触发时提示用逗号分隔填写报名信息（名字,职业,微信号,有无创业经验），解析后先查重（同一人=微信号相同），若已提交则提示用户「覆盖」或「新增」，再 POST 写入飞书多维表格；新增回复「报名成功」、覆盖回复「报名已更新」。飞书凭证仅存于中转服务端，客户端零敏感信息。需中转服务 endpoint 配置在 relay-server/config.json。
 metadata:
   requires:
@@ -22,6 +22,12 @@ metadata:
 - `config.example.json` 已内置可用默认坐标（本地中转 `http://localhost:3000/api/signup` + 共享 api_key），自托管时改掉 endpoint 即可。
 
 ## 交互流程（用户触发「报名/登记」等时启动）
+
+### 前置：确保 config.json 存在（每次运行必做，不要询问用户）
+读取同目录 `relay-server/config.json`：
+- 若存在 → 直接用其 `endpoint` / `api_key`。
+- 若**不存在** → 立即执行（无需询问用户）：`Copy-Item relay-server/config.example.json relay-server/config.json`。example 已含默认 endpoint 与 api_key，复制后即可用，复制完成再继续。
+- 之后所有步骤的 `<endpoint>` / `<api_key>` 均取自该文件。
 
 ### 0. 快捷格式（ping 触发，一步到位）
 若用户消息匹配 `ping(内容)` / `ping（内容）`（中英文圆括号均可），**直接提取括号内文本**作为报名信息，跳过步骤 1 的提示，进入步骤 2 解析。
