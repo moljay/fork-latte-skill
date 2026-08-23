@@ -1,3 +1,7 @@
 relay-server/.env
 relay-server/*.log
 relay-server/relay.err
+relay-server/node.out
+relay-server/node.err
+relay-server/launcher.out
+relay-server/launcher.err
